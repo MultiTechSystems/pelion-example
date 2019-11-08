@@ -29,6 +29,9 @@ static MbedCloudClient *cloud_client;
 static bool cloud_client_running = true;
 static NetworkInterface *network = NULL;
 
+#define FCC_ROT_SIZE 16
+const uint8_t MBED_CLOUD_DEV_ROT[FCC_ROT_SIZE] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16};
+
 // Fake entropy needed for non-TRNG boards. Suitable only for demo devices.
 const uint8_t MBED_CLOUD_DEV_ENTROPY[] = { 0xf6, 0xd6, 0xc0, 0x09, 0x9e, 0x6e, 0xf2, 0x37, 0xdc, 0x29, 0x88, 0xf1, 0x57, 0x32, 0x7d, 0xde, 0xac, 0xb3, 0x99, 0x8c, 0xb9, 0x11, 0x35, 0x18, 0xeb, 0x48, 0x29, 0x03, 0x6a, 0x94, 0x6d, 0xe8, 0x40, 0xc0, 0x28, 0xcc, 0xe4, 0x04, 0xc3, 0x1f, 0x4b, 0xc2, 0xe0, 0x68, 0xa0, 0x93, 0xe6, 0x3a };
 
@@ -140,7 +143,8 @@ int main(void)
     }
 
     // Inject hardcoded entropy for the device. Suitable only for demo devices.
-    (void) fcc_entropy_set(MBED_CLOUD_DEV_ENTROPY, sizeof(MBED_CLOUD_DEV_ENTROPY));
+    //(void) fcc_entropy_set(MBED_CLOUD_DEV_ENTROPY, sizeof(MBED_CLOUD_DEV_ENTROPY));
+    (void) fcc_rot_set(MBED_CLOUD_DEV_ROT, FCC_ROT_SIZE);
     status = fcc_developer_flow();
     if (status != FCC_STATUS_SUCCESS && status != FCC_STATUS_KCM_FILE_EXIST_ERROR && status != FCC_STATUS_CA_ERROR) {
         printf("fcc_developer_flow() failed with %d\n", status);
@@ -199,7 +203,7 @@ int main(void)
         } else if (in_char == 'r') {
             (void) fcc_storage_delete(); // When 'r' is pressed, erase storage and reboot the board.
             printf("Storage erased, rebooting the device.\n\n");
-            wait(1);
+            ThisThread::sleep_for(1000);
             NVIC_SystemReset();
         } else if (in_char > 0 && in_char != 0x03) { // Ctrl+C is 0x03 in Mbed OS and Linux returns negative number
             button_press(); // Simulate button press
