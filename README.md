@@ -3,7 +3,6 @@
 This is a simplified example with the following features:
 - Mbed OS 5.14.1 and Pelion Device Management Client 4.0.0
 - Support for FW Update
-- 200 lines of code + credential sources
 
 # Developer guide
 
